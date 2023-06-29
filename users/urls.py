@@ -9,7 +9,8 @@ from .views import (DashBoardView,
                     ResidenteUpdateView,
                     ResidenteDeleteView,
                     ResidenteDetailView,
-
+                    ResidenteIngresoEgresoListView,
+                    ResidenteIngresoEgresoUpdateView,
 
                     )
 
@@ -26,4 +27,6 @@ urlpatterns = [
     path('residente/update/<int:pk>/', ResidenteUpdateView.as_view(), name='users-residente-update'),
     path('residente/delete/<int:pk>/', ResidenteDeleteView.as_view(), name='users-residente-delete'),
     path('residente/details/<int:pk>/', ResidenteDetailView.as_view(), name='users-residente-detail'),
+    path('residente/ingreso-egreso/', ResidenteIngresoEgresoListView.as_view(), name='users-residente-ingreso-egreso-list'),
+    path('residente/ingreso-egreso/update/<int:pk>/', ResidenteIngresoEgresoUpdateView.as_view(), name='users-residente-ingreso-egreso-update'),
 ]

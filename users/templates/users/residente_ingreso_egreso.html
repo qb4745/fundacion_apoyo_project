@@ -38,8 +38,8 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-person"></i>Residentes</a>
-                    <a href="{% url 'users:users-residente-ingreso-egreso-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
+                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person"></i>Residentes</a>
+                    <a href="{% url 'users:users-residente-ingreso-egreso-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
                     <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-file-medical"></i>Fichas Médicas</a>
 
                 </div>
@@ -146,12 +146,11 @@
                 <div class="bg-light rounded h-100 p-4">
 
 
-                    <h4 class="mb-4">Puedes Crear un Residente con el boton "Crear Residente".</h4>
-                    <a href="{% url 'users:users-residente-create' %}" class="btn btn-outline-primary btn-rounded"><i class="fa-regular fa-square-plus fa-lg"><strong>Crear Residente</strong></i></a>
+                    <h4 class="mb-4">Puedes Ingresar o Egresar un Residente con el boton "Ingreso" o "Egreso".</h4>
                     <hr>
 
 
-                        <h4 class="mb-4">Todos los Residentes</h4>
+                        <h4 class="mb-4">Residentes Ingresados</h4>
 
                             {% comment %} <h5 class="mb-4">Creado el: {{ mandato.created }}.</h5>
                             {% if mandato.created != mandato.updated %}
@@ -164,10 +163,10 @@
                                             <th scope="col">ID #</th>
                                             <th scope="col">Nombre</th>
                                             <th scope="col">R.U.T.</th>
-                                            <th scope="col">Edad</th>
                                             <th scope="col">En Hogar</th>
-                                            <th scope="col">Editar</th>
-                                            <th scope="col">Eliminar</th>
+                                            <th scope="col">Ingreso/Egreso</th>
+                                            <th scope="col">Fecha de Ingreso</th>
+                                            <th scope="col">Fecha de Egreso</th>
                                         </tr>
                                     </thead>
 
@@ -178,18 +177,19 @@
                                             <td><a href="{{ residente.get_detail_url }}">{{ residente.pk }}</a></td>
                                             <td><a href="{{ residente.get_detail_url }}">{{ residente.nombre_apellido }}</a></td>
                                             <td><h6>{{ residente.rut }}</h6></td>
-                                            <td><h6>{{ residente.get_age }}</h6></td>
                                             {% if residente.estado_en_hogar == 'I' %}
                                                 <td><h6><span class="badge rounded-pill badge-success">Activo</span></h6></td>
+                                                <td><h6><a href="{{ residente.get_ingreso_egreso_update_url }}" class="btn btn-sm btn-warning mt-auto">Egreso</a></h6></td>
                                             {% elif residente.estado_en_hogar == 'E' %}
                                                 <td><h6><span class="badge rounded-pill badge-danger">Egresado</span></h6></td>
+                                                <td><h6><a href="{{ residente.get_ingreso_egreso_update_url }}" class="btn btn-sm btn-success mt-auto">Ingreso</a></h6></td>
                                             {% endif %}
-                                            <td><h6><a href="{{ residente.get_update_url }}" class="btn btn-sm btn-warning mt-auto">Editar</a></h6></td>
-
-                                            <td><h6><form method="post" action="{% url 'users:users-residente-delete' residente.pk %}">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-sm btn-danger mt-auto" onclick="return confirm('¿Estás seguro de eliminar el Residente?')">Eliminar</button>
-                                            </form></h6></td>
+                                            <td><h6>{{ residente.fecha_admision }}</h6></td>
+                                            {% if residente.fecha_egreso %}
+                                                <td><h6>{{ residente.fecha_egreso }}</h6></td>
+                                            {% else %}
+                                                <td><h6><span class="badge rounded-pill badge-secondary">Sin Egreso</span></h6></td>
+                                            {% endif %}
 
 
 

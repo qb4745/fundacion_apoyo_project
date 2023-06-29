@@ -31,11 +31,14 @@ class ResidenteForm(forms.ModelForm):
     fecha_nacimiento = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'})
     )
+    fecha_admision = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
 
     class Meta:
         model = Residente
         fields = ['nombre_apellido', 'rut', 'nacionalidad', 'fecha_nacimiento', 'estado_civil', 'genero',
-                  'direccion', 'comuna', 'celular', 'en_hogar']
+                  'direccion', 'comuna', 'celular', 'fecha_admision']
         labels = {
             'nombre_apellido': 'Nombre y Apellido',
             'rut': 'RUT',
@@ -46,7 +49,7 @@ class ResidenteForm(forms.ModelForm):
             'direccion': 'Dirección',
             'comuna': 'Comuna',
             'celular': 'Celular',
-            'en_hogar': 'En Hogar',
+            'fecha_admision': 'Fecha de Admisión',
         }
 
     def clean_fecha_nacimiento(self):
@@ -55,6 +58,12 @@ class ResidenteForm(forms.ModelForm):
             raise forms.ValidationError("La fecha de nacimiento debe ser anterior o igual a la fecha actual.")
         return fecha_nacimiento
 
+    def clean_fecha_admision(self):
+        fecha_admision = self.cleaned_data.get('fecha_admision')
+        if fecha_admision and fecha_admision > timezone.now().date():
+            raise forms.ValidationError("La fecha de admisión debe ser anterior o igual a la fecha actual.")
+        return fecha_admision
+
 
 class ResidenteDetailForm(forms.ModelForm):
     age = forms.IntegerField(label='Edad')
@@ -62,7 +71,7 @@ class ResidenteDetailForm(forms.ModelForm):
     class Meta:
         model = Residente
         fields = ['nombre_apellido', 'rut', 'age', 'nacionalidad', 'estado_civil', 'genero',
-                  'direccion', 'comuna', 'celular', 'en_hogar']
+                  'direccion', 'comuna', 'celular', 'fecha_admision']
         labels = {
             'nombre_apellido': 'Nombre y Apellido',
             'rut': 'RUT',
@@ -73,7 +82,7 @@ class ResidenteDetailForm(forms.ModelForm):
             'direccion': 'Dirección',
             'comuna': 'Comuna',
             'celular': 'Celular',
-            'en_hogar': 'En Hogar',
+            'fecha_admision': 'Fecha de Admisión',
         }
 
     def __init__(self, *args, **kwargs):
@@ -87,4 +96,42 @@ class ResidenteDetailForm(forms.ModelForm):
         age = cleaned_data.get('age')
         if age is None or age <= 0:
             self.add_error('age', 'La edad debe ser un número válido.')
+        return cleaned_data
+
+
+class ResidentIngresoEgresoForm(forms.ModelForm):
+    fecha_egreso = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+
+    class Meta:
+        model = Residente
+        fields = ['nombre_apellido', 'rut', 'estado_en_hogar', 'fecha_admision', 'fecha_egreso']
+        labels = {
+            'nombre_apellido': 'Nombre y Apellido',
+            'rut': 'RUT',
+            'estado_en_hogar': 'Estado en Hogar',
+            'fecha_admision': 'Fecha de Admisión',
+            'fecha_egreso': 'Fecha de Egreso',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['fecha_egreso'].required = False
+
+    def clean_fecha_egreso(self):
+        fecha_egreso = self.cleaned_data.get('fecha_egreso')
+        estado_en_hogar = self.cleaned_data.get('estado_en_hogar')
+
+        if estado_en_hogar == 'E' and not fecha_egreso:
+            raise forms.ValidationError("La fecha de egreso es requerida para residentes egresados.")
+
+        return fecha_egreso
+
+    def clean(self):
+        cleaned_data = super().clean()
+        estado_en_hogar = cleaned_data.get('estado_en_hogar')
+        fecha_egreso = cleaned_data.get('fecha_egreso')
+
+        if estado_en_hogar == 'I' and fecha_egreso:
+            self.add_error('fecha_egreso', "No se debe especificar una fecha de egreso para residentes activos o ingresados.")
+
         return cleaned_data

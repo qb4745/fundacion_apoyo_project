@@ -4,7 +4,7 @@ from django.shortcuts import render, reverse
 from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView, ListView, DetailView
 
 from .models import Mandato, Residente
-from .forms import MandatoForm, ResidenteForm, ResidenteDetailForm
+from .forms import MandatoForm, ResidenteForm, ResidenteDetailForm, ResidentIngresoEgresoForm
 from .mixins import StaffRequiredMixin
 
 
@@ -68,6 +68,11 @@ class ResidenteListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
     template_name = 'users/residente_list.html'
     context_object_name = 'residentes'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by('-estado_en_hogar')  # Sort by estado_en_hogar field in descending order
+        return queryset
+
 
 class ResidenteCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
     template_name = 'users/residente_create.html'
@@ -107,3 +112,24 @@ class ResidenteDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
             field.widget.attrs['disabled'] = True
         context['form'] = form
         return context
+
+
+
+class ResidenteIngresoEgresoListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    model = Residente
+    template_name = 'users/residente_ingreso_egreso.html'
+    context_object_name = 'residentes'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by('-estado_en_hogar')  # Sort by estado_en_hogar field in descending order
+        return queryset
+
+
+class ResidenteIngresoEgresoUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
+    template_name = 'users/residente_ingreso_egreso_update.html'
+    form_class = ResidentIngresoEgresoForm
+    queryset = Residente.objects.all()
+
+    def get_success_url(self):
+        return reverse("users:users-residente-ingreso-egreso-list")

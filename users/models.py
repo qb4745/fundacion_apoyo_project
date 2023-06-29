@@ -53,6 +53,9 @@ class Mandato(models.Model):
         super().save(*args, **kwargs)
 
 
+
+
+
 GENERO_CHOICES = (
         ('M', 'Masculino'),
         ('F', 'Femenino'),
@@ -64,6 +67,12 @@ ESTADO_CIVIL_CHOICES = (
         ('V', 'Viudo/a'),
     )
 
+ESTADO_EN_HOGAR_CHOICES = (
+        ('I', 'Ingresado/a'),
+        ('E', 'Egresado/a'),
+    )
+
+
 class Residente(models.Model):
     nombre_apellido = models.CharField(max_length=100)
     rut = models.CharField(max_length=20)
@@ -74,7 +83,9 @@ class Residente(models.Model):
     direccion = models.CharField(max_length=200)
     comuna = models.CharField(max_length=100)
     celular = models.CharField(max_length=20)
-    en_hogar = models.BooleanField(default=True)
+    estado_en_hogar = models.CharField(max_length=1, choices=ESTADO_EN_HOGAR_CHOICES, default='I')
+    fecha_admision = models.DateField(null=True, blank=True)
+    fecha_egreso = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre_apellido
@@ -91,8 +102,44 @@ class Residente(models.Model):
     def get_detail_url(self):
         return reverse("users:users-residente-detail", kwargs={'pk': self.pk})
 
+    def get_ingreso_egreso_update_url(self):
+        return reverse("users:users-residente-ingreso-egreso-update", kwargs={'pk': self.pk})
+
     def get_age(self):
         return int((datetime.date.today() - self.fecha_nacimiento).days / 365.25)
+
+    def save(self, *args, **kwargs):
+        if self.estado_en_hogar == 'E' and not self.fecha_egreso:
+            raise ValueError("La fecha de egreso es requerida para residentes egresados.")
+
+        if self.estado_en_hogar != 'E':
+            self.fecha_egreso = None
+
+        super().save(*args, **kwargs)
+
+    def egreso(self, fecha_egreso):
+        self.estado_en_hogar = 'Egresado'
+        self.fecha_egreso = fecha_egreso
+        self.save()
+
+
+
+
+
+
+class Ingreso(models.Model):
+    residente = models.ForeignKey(Residente, on_delete=models.CASCADE)
+    fecha_admision = models.DateField()
+
+    def __str__(self):
+        return f"Admisión de {self.residente.nombre_apellido}"
+
+class Egreso(models.Model):
+    residente = models.ForeignKey(Residente, on_delete=models.CASCADE)
+    fecha_egreso = models.DateField()
+
+    def __str__(self):
+        return f"Egreso de {self.residente.nombre_apellido}"
 
 
 class Fichamedica(models.Model):

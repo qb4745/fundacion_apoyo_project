@@ -9,7 +9,7 @@
             </nav>
         </div>
 
-        {% if request.user.is_authenticated %}
+        {% if request.user.is_authenticated and not request.user.is_staff %}
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'users:users-mandato' %}">Mi Cuenta</a>
@@ -17,6 +17,15 @@
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'account_logout' %}">Cerrar Sesión</a>
             </li>
+        {% elif request.user.is_staff %}
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'users:users-residente-list' %}">Mi Cuenta</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'account_logout' %}">Cerrar Sesión</a>
+            </li>
+
         {% else %}
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
