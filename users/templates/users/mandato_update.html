@@ -31,12 +31,9 @@
                         <span>Usuario</span>
                     </div>
                 </div>
-                <div class="navbar-nav w-100">
-                    <a href="{% url 'users:users-dashboard' %}" class="nav-item nav-link "><i class="far fa-file-alt me-2"></i>Mi Información</a>
-
-                    <a href="{% url 'users:users-mandato' %}" class="nav-item nav-link active"><i class="fa fa-credit-card"></i></i>Mi Mandato</a>
-
-                </div>
+                <a href="{% url 'users:users-dashboard' %}" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>Mi Cuenta</h3>
+                </a>
             </nav>
         </div>
         <!-- Sidebar End -->

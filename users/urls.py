@@ -4,6 +4,13 @@ from .views import (DashBoardView,
                     MandatoCreateView,
                     MandatoUpdateView,
                     MandatoDeleteView,
+                    ResidenteListView,
+                    ResidenteCreateView,
+                    ResidenteUpdateView,
+                    ResidenteDeleteView,
+                    ResidenteDetailView,
+
+
                     )
 
 app_name = 'users'
@@ -14,4 +21,9 @@ urlpatterns = [
     path('mandato/create', MandatoCreateView.as_view(), name='users-mandato-create'),
     path('mandato/update/<int:pk>/', MandatoUpdateView.as_view(), name='users-mandato-update'),
     path('mandato/delete/<int:pk>/', MandatoDeleteView.as_view(), name='users-mandato-delete'),
+    path('residente/', ResidenteListView.as_view(), name='users-residente-list'),
+    path('residente/create', ResidenteCreateView.as_view(), name='users-residente-create'),
+    path('residente/update/<int:pk>/', ResidenteUpdateView.as_view(), name='users-residente-update'),
+    path('residente/delete/<int:pk>/', ResidenteDeleteView.as_view(), name='users-residente-delete'),
+    path('residente/details/<int:pk>/', ResidenteDetailView.as_view(), name='users-residente-detail'),
 ]

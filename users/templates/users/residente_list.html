@@ -1,10 +1,12 @@
 {% extends "users/base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
-{% block head_title %}Jardineando - Inicio{% endblock head_title %}
+{% block head_title %}Fundación Apoyo - Administrador{% endblock head_title %}
+
 
 {% block content %}
+
+
 <div class="container-xxl position-relative bg-white d-flex p-0">
         <!-- Spinner Start -->
         <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -18,7 +20,7 @@
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
             <nav class="navbar bg-light navbar-light">
-                <a href="{% url 'users:users-dashboard' %}" class="navbar-brand mx-4 mb-3">
+                <a href="{% url 'users:users-residente-list' %}" class="navbar-brand mx-4 mb-3">
                     <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>Mi Cuenta</h3>
                 </a>
                 <div class="d-flex align-items-center ms-4 mb-4">
@@ -27,12 +29,18 @@
                         <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
                     </div>
                     <div class="ms-3">
-                        <h6 class="mb-0"> {{ request.user.username|capfirst }}</h6>
-                        <span>Usuario</span>
+                        <h6 class="mb-0"> {{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}</h6>
+                        {% if request.user.groups.first %}
+                        <span class="d-none d-lg-inline-flex">{{ request.user.groups.first.name }}</span>
+                        {% else %}
+                        <span class="d-none d-lg-inline-flex">Sin grupo Asignado</span>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="{% url 'users:users-mandato' %}" class="nav-item nav-link active"><i class="fa fa-credit-card"></i></i>Mi Mandato</a>
+                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-person"></i>Residentes</a>
+                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
+                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-file-medical"></i>Fichas Médicas</a>
 
                 </div>
             </nav>
@@ -119,8 +127,7 @@
             </div>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                    <img class="rounded-circle me-lg-2" src="img/user.jpg" alt="" style="width: 40px; height: 40px;">
-                    <span class="d-none d-lg-inline-flex">John Doe</span>
+                    <h6 class="mb-0"> {{ request.user.first_name|capfirst }} {{ request.user.last_name|capfirst }}</h6>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
                     <a href="#" class="dropdown-item">Mi Perfil</a>
@@ -138,16 +145,66 @@
             <div class="col-12">
                 <div class="bg-light rounded h-100 p-4">
 
-                    <h4>Crear un Residente</h4>
-                <hr />
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <button type="submit" class="btn btn-success">Crear</button>
 
-                </form>
+                    <h4 class="mb-4">Puedes Crear un Residente con el boton "Crear Residente".</h4>
+                    <a href="{% url 'users:users-residente-create' %}" class="btn btn-outline-primary btn-rounded"><i class="fa-regular fa-square-plus fa-lg"><strong>Crear Residente</strong></i></a>
+                    <hr>
+
+
+                        <h4 class="mb-4">Residentes</h4>
+
+                            {% comment %} <h5 class="mb-4">Creado el: {{ mandato.created }}.</h5>
+                            {% if mandato.created != mandato.updated %}
+                                <h5 class="mb-4">Última modificación: {{ mandato.updated }}.</h5>
+                            {% endif %} {% endcomment %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID #</th>
+                                            <th scope="col">Nombre</th>
+                                            <th scope="col">R.U.T.</th>
+                                            <th scope="col">Edad</th>
+                                            <th scope="col">En Hogar</th>
+                                            <th scope="col">Editar</th>
+                                            <th scope="col">Hacer Egreso</th>
+                                            <th scope="col">Eliminar</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for residente in residentes %}
+
+                                        <tr><h6>
+                                            <td><a href="{{ residente.get_detail_url }}">{{ residente.pk }}</a></td>
+                                            <td><a href="{{ residente.get_detail_url }}">{{ residente.nombre_apellido }}</a></td>
+                                            <td><h6>{{ residente.rut }}</h6></td>
+                                            <td><h6>{{ residente.get_age }}</h6></td>
+                                            {% if residente.en_hogar %}
+                                            <td><h6><span class="badge rounded-pill badge-success">Activo</span></h6></td>
+                                            {% else %}
+                                            <td><h6><span class="badge rounded-pill badge-danger">Retirado</span></h6></td>
+                                            {% endif %}
+                                            <td><h6><a href="{{ residente.get_update_url }}" class="btn btn-sm btn-warning mt-auto">Editar</a></h6></td>
+                                            <td><h6><a href="{{ residente.get_update_url }}" class="btn btn-sm btn-info mt-auto">Egreso</a></h6></td>
+
+                                            <td><h6><form method="post" action="{% url 'users:users-residente-delete' residente.pk %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger mt-auto" onclick="return confirm('¿Estás seguro de eliminar el Residente?')">Eliminar</button>
+                                            </form></h6></td>
+
+
+
+                                        </tr>
+                                    {% endfor %}
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        <hr>
                 </div>
-                <hr>
             </div>
             <!-- Blank End -->
 

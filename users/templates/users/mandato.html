@@ -162,6 +162,7 @@
                                             <th scope="col">Número de Tarjeta</th>
                                             <th scope="col">Casa Comercial</th>
                                             <th scope="col">Modalidad de pago</th>
+                                            <th scope="col">Fecha de Inicio</th>
                                             <th scope="col">Editar</th>
                                             <th scope="col">Eliminar</th>
 
@@ -176,6 +177,7 @@
                                             <td><h6>{{ mandato.get_last_digits }}</h6></td>
                                             <td><h6>{{ mandato.casa_comercial }}</h6></td>
                                             <td><h6>{{ mandato.modalidad }}</h6></td>
+                                            <td><h6>{{ mandato.start_date }}</h6></td>
                                             <td><h6><a href="{{ mandato.get_update_url }}" class="btn btn-sm btn-warning mt-auto">Editar</a></h6></td>
                                             <td><h6><form method="post" action="{% url 'users:users-mandato-delete' mandato.pk %}">
                                                 {% csrf_token %}

@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, reverse
-from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView
+from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView, ListView, DetailView
 
-from .models import Mandato
-from .forms import MandatoForm
+from .models import Mandato, Residente
+from .forms import MandatoForm, ResidenteForm, ResidenteDetailForm
+from .mixins import StaffRequiredMixin
 
 
 class DashBoardView(LoginRequiredMixin, TemplateView):
@@ -60,3 +61,49 @@ class MandatoDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_success_url(self):
         return reverse("users:users-mandato")
+
+
+class ResidenteListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    model = Residente
+    template_name = 'users/residente_list.html'
+    context_object_name = 'residentes'
+
+
+class ResidenteCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
+    template_name = 'users/residente_create.html'
+    form_class = ResidenteForm
+
+
+    def get_success_url(self):
+        return reverse("users:users-residente-list")
+
+
+class ResidenteUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
+    template_name = 'users/residente_update.html'
+    form_class = ResidenteForm
+    queryset = Residente.objects.all()
+
+    def get_success_url(self):
+        return reverse("users:users-residente-list")
+
+
+class ResidenteDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    template_name = 'users/residente_delete.html'
+    queryset = Residente.objects.all()
+
+    def get_success_url(self):
+        return reverse("users:users-residente-list")
+
+class ResidenteDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
+    template_name = 'users/residente_detail.html'
+    model = Residente
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        residente = self.get_object()
+        form = ResidenteDetailForm(instance=residente)
+        # Disable editing in the form
+        for field in form.fields.values():
+            field.widget.attrs['disabled'] = True
+        context['form'] = form
+        return context
