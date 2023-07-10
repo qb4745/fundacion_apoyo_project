@@ -2,9 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render, reverse
 from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView, ListView, DetailView
-
-from .models import Mandato, Residente
-from .forms import MandatoForm, ResidenteForm, ResidenteDetailForm, ResidentIngresoEgresoForm
+from django.urls import reverse_lazy
+from .models import Mandato, Residente, Medicamento, PlanMedicacion, DosisMedicamento
+from .forms import (MandatoForm, ResidenteForm, ResidenteDetailForm,
+                    ResidentIngresoEgresoForm, MedicamentoForm, PlanMedicacionForm,
+                    )
 from .mixins import StaffRequiredMixin
 
 
@@ -133,3 +135,98 @@ class ResidenteIngresoEgresoUpdateView(LoginRequiredMixin, StaffRequiredMixin, U
 
     def get_success_url(self):
         return reverse("users:users-residente-ingreso-egreso-list")
+
+
+from .models import Medicamento, PlanMedicacion, DosisMedicamento
+
+# Vistas para el modelo Medicamento
+
+class MedicamentoListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    model = Medicamento
+    template_name = 'users/medicamento.html'
+    context_object_name = 'medicamentos'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by('-id')
+        return queryset
+
+
+class MedicamentoCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
+    template_name = 'users/medicamento_create.html'
+    form_class = MedicamentoForm
+
+    def get_success_url(self):
+        return reverse("users:users-medicamento-list")
+
+
+class MedicamentoUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
+    template_name = 'users/medicamento_update.html'
+    form_class = MedicamentoForm
+    queryset = Medicamento.objects.all()
+
+    def get_success_url(self):
+        return reverse("users:users-medicamento-list")
+
+
+class MedicamentoDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = Medicamento
+    success_url = reverse_lazy('users:users-medicamento-list')
+    # Puedes especificar el template_name si deseas utilizar un template personalizado
+
+
+# Vistas para el modelo PlanMedicacion
+
+class PlanMedicacionListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    model = PlanMedicacion
+    template_name = 'users/planmedicacion_list.html'
+    context_object_name = 'list'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        queryset = queryset.order_by('-id')
+        return queryset
+
+
+class PlanMedicacionCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
+    template_name = 'users/planmedicacion_create.html'
+    form_class = PlanMedicacionForm
+    success_url = reverse_lazy('users:users-planmedicacion-list')
+
+
+
+class PlanMedicacionUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
+    template_name = 'users/medicamento_update.html'
+    form_class = PlanMedicacionForm
+    queryset = PlanMedicacion.objects.all()
+
+    def get_success_url(self):
+        return reverse("users:users-planmedicacion-list")
+
+
+class PlanMedicacionDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    model = PlanMedicacion
+    success_url = reverse_lazy('users:users-planmedicacion-list')
+    # Puedes especificar el template_name si deseas utilizar un template personalizado
+
+
+
+# Vistas para el modelo DosisMedicamento
+class DosisMedicamentoListView(ListView):
+    model = DosisMedicamento
+    # Puedes especificar el template_name si deseas utilizar un template personalizado
+
+class DosisMedicamentoCreateView(CreateView):
+    model = DosisMedicamento
+    fields = ['plan_medicacion', 'medicamento', 'dosis', 'hora_administracion']
+    # Puedes especificar el template_name si deseas utilizar un template personalizado
+
+class DosisMedicamentoUpdateView(UpdateView):
+    model = DosisMedicamento
+    fields = ['plan_medicacion', 'medicamento', 'dosis', 'hora_administracion']
+    # Puedes especificar el template_name si deseas utilizar un template personalizado
+
+class DosisMedicamentoDeleteView(DeleteView):
+    model = DosisMedicamento
+    success_url = reverse_lazy('dosismedicamento-list')
+    # Puedes especificar el template_name si deseas utilizar un template personalizado

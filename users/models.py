@@ -151,3 +151,62 @@ class Fichamedica(models.Model):
 
     def __str__(self):
         return self.residente.nombre_apellido
+
+
+class Medicamento(models.Model):
+    nombre = models.CharField(max_length=100)
+    compuesto = models.CharField(max_length=100)
+    dosis = models.CharField(max_length=100)
+
+    # Otros campos adicionales según tus necesidades
+    # ...
+
+    def __str__(self):
+        return f"Medicamento {self.nombre} - {self.compuesto} - {self.dosis}"
+
+    def get_absolute_url(self):
+        return reverse("users:users-medicamento-list")
+
+    def get_update_url(self):
+        return reverse("users:users-medicamento-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-medicamento-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-medicamento-detail", kwargs={'pk': self.pk})
+
+class PlanMedicacion(models.Model):
+    residente = models.ForeignKey('Residente', on_delete=models.CASCADE)
+    fecha_inicio = models.DateField()
+    medicamentos = models.ManyToManyField(Medicamento, through='DosisMedicamento')
+
+    # Otros campos adicionales según tus necesidades
+    # ...
+
+    def __str__(self):
+        return f"{self.pk} Plan de Medicación para {self.residente}"
+
+    def get_absolute_url(self):
+        return reverse("users:users-planmedicacion-list")
+
+    def get_update_url(self):
+        return reverse("users:users-planmedicacion-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-planmedicacion-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-planmedicacion-detail", kwargs={'pk': self.pk})
+
+class DosisMedicamento(models.Model):
+    plan_medicacion = models.ForeignKey(PlanMedicacion, on_delete=models.CASCADE)
+    medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE)
+    dosis = models.CharField(max_length=100)
+    hora_administracion = models.TimeField()
+
+    # Otros campos adicionales según tus necesidades
+    # ...
+
+    def __str__(self):
+        return f"{self.plan_medicacion} - Dosis de {self.medicamento}"

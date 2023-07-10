@@ -11,6 +11,15 @@ from .views import (DashBoardView,
                     ResidenteDetailView,
                     ResidenteIngresoEgresoListView,
                     ResidenteIngresoEgresoUpdateView,
+                    MedicamentoListView,
+                    MedicamentoCreateView,
+                    MedicamentoUpdateView,
+                    MedicamentoDeleteView,
+                    PlanMedicacionListView,
+                    PlanMedicacionCreateView,
+                    PlanMedicacionUpdateView,
+                    PlanMedicacionDeleteView,
+
 
                     )
 
@@ -29,4 +38,12 @@ urlpatterns = [
     path('residente/details/<int:pk>/', ResidenteDetailView.as_view(), name='users-residente-detail'),
     path('residente/ingreso-egreso/', ResidenteIngresoEgresoListView.as_view(), name='users-residente-ingreso-egreso-list'),
     path('residente/ingreso-egreso/update/<int:pk>/', ResidenteIngresoEgresoUpdateView.as_view(), name='users-residente-ingreso-egreso-update'),
+    path('medicamento/', MedicamentoListView.as_view(), name='users-medicamento-list'),
+    path('medicamento/create', MedicamentoCreateView.as_view(), name='users-medicamento-create'),
+    path('medicamento/update/<int:pk>/', MedicamentoUpdateView.as_view(), name='users-medicamento-update'),
+    path('medicamento/delete/<int:pk>/', MedicamentoDeleteView.as_view(), name='users-medicamento-delete'),
+    path('planmedicacion/', PlanMedicacionListView.as_view(), name='users-planmedicacion-list'),
+    path('planmedicacion/create', PlanMedicacionCreateView.as_view(), name='users-planmedicacion-create'),
+    path('planmedicacion/update/<int:pk>/', PlanMedicacionUpdateView.as_view(), name='users-planmedicacion-update'),
+    path('planmedicacion/delete/<int:pk>/', PlanMedicacionDeleteView.as_view(), name='users-planmedicacion-delete'),
 ]

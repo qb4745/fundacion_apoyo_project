@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from .models import Mandato, Residente
+from .models import Mandato, Residente, Medicamento, PlanMedicacion, DosisMedicamento
 
 
 class MandatoForm(forms.ModelForm):
@@ -135,3 +135,30 @@ class ResidentIngresoEgresoForm(forms.ModelForm):
             self.add_error('fecha_egreso', "No se debe especificar una fecha de egreso para residentes activos o ingresados.")
 
         return cleaned_data
+
+
+class MedicamentoForm(forms.ModelForm):
+    class Meta:
+        model = Medicamento
+        fields = ['nombre', 'compuesto', 'dosis']
+        labels = {
+            'nombre': 'Nombre',
+            'compuesto': 'Compuesto',
+            'dosis': 'Dosis',
+        }
+
+
+class PlanMedicacionForm(forms.ModelForm):
+    fecha_inicio = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'})
+    )
+    class Meta:
+        model = PlanMedicacion
+        # all fields
+        fields = ["residente", "fecha_inicio"]
+
+    def clean_fecha_inicio(self):
+        fecha_inicio = self.cleaned_data.get('fecha_inicio')
+        if fecha_inicio < timezone.now().date():
+            raise forms.ValidationError("La fecha de inicio debe ser posterior o igual a la fecha actual.")
+        return fecha_inicio

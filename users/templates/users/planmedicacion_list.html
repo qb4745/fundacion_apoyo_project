@@ -1,6 +1,5 @@
 {% extends "users/base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block head_title %}Fundación Apoyo - Administrador{% endblock head_title %}
 
@@ -39,11 +38,11 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-person"></i>Residentes</a>
-                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
+                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person"></i>Residentes</a>
+                    <a href="{% url 'users:users-residente-ingreso-egreso-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
                     <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-file-medical"></i>Fichas Médicas</a>
                     <a href="{% url 'users:users-medicamento-list' %}" class="nav-item nav-link "><i class="fa-solid fa-capsules"></i>Medicamentos</a>
-                    <a href="{% url 'users:users-planmedicacion-list' %}" class="nav-item nav-link"><i class="fa-solid fa-map"></i></i>Plan de Medicación</a>
+                    <a href="{% url 'users:users-planmedicacion-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-map"></i></i>Plan de Medicación</a>
 
                 </div>
             </nav>
@@ -148,19 +147,61 @@
             <div class="col-12">
                 <div class="bg-light rounded h-100 p-4">
 
-                    <h4>Información del Residente</h4>
-                    <h6><a href="{{ residente.get_absolute_url }}" class="btn btn-sm btn-info mt-auto">Volver</a></h6>
-                <hr />
-                <form>
-                    {{ form|crispy }}
-                    <!-- Display other details of the Residente object -->
-                </form>
-                <h6><a href="{{ residente.get_absolute_url }}" class="btn btn-sm btn-info mt-auto">Volver</a></h6>
 
+                    <h4 class="mb-4">Puedes Crear un Plan Médico con el boton "Crear Plan Médico".</h4>
+                    <a href="{% url 'users:users-planmedicacion-create' %}" class="btn btn-outline-primary btn-rounded"><i class="fa-regular fa-square-plus fa-lg"><strong>Crear Plan Médico</strong></i></a>
+                    <hr>
+
+
+                        <h4 class="mb-4">Todos los Plan Médico</h4>
+
+                            {% comment %} <h5 class="mb-4">Creado el: {{ mandato.created }}.</h5>
+                            {% if mandato.created != mandato.updated %}
+                                <h5 class="mb-4">Última modificación: {{ mandato.updated }}.</h5>
+                            {% endif %} {% endcomment %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID #</th>
+                                            <th scope="col">Residente</th>
+                                            <th scope="col">Fecha_inicio</th>
+                                            <th scope="col">Medicamentos</th>
+
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {% for object in list %}
+
+                                        <tr><h6>
+                                            {% comment %} <td><a href="{{ medicamento.get_detail_url }}">{{ medicamento.pk }}</a></td>
+                                            <td><a href="{{ medicamento.get_detail_url }}">{{ medicamento.nombre }}</a></td> {% endcomment %}
+                                            <td><h6>{{ object.pk }}</h6></td>
+                                            <td><h6>{{ object.residente }}</h6></td>
+                                            <td><h6>{{ object.fecha_inicio }}</h6></td>
+                                            <td><h6><a href="{{ object.get_update_url }}" class="btn btn-sm btn-warning mt-auto">Editar</a></h6></td>
+
+                                            <td><h6><form method="post" action="{% url 'users:users-planmedicacion-delete' object.pk %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-danger mt-auto" onclick="return confirm('¿Estás seguro de eliminar el Plan Méedico?')">Eliminar</button>
+                                            </form></h6></td>
+
+
+
+                                        </tr>
+                                    {% endfor %}
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        <hr>
                 </div>
-                <hr>
             </div>
             <!-- Blank End -->
+
 
 
 
