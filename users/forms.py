@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from .models import Mandato, Residente, Medicamento, PlanMedicacion, DosisMedicamento
+from .models import Mandato, Residente, Medicamento, PlanMedicacion, DosisMedicamento, FichaMedica
 
 
 class MandatoForm(forms.ModelForm):
@@ -187,3 +187,15 @@ class PlanMedicacionDetailForm(forms.ModelForm):
         fields = "__all__"
 
 
+class FichaMedicaForm(forms.ModelForm):
+
+    class Meta:
+        model = FichaMedica
+        fields = "__all__"
+
+
+class FichaMedicaDetailForm(forms.ModelForm):
+
+        class Meta:
+            model = FichaMedica
+            fields = "__all__"

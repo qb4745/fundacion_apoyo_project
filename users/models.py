@@ -127,30 +127,42 @@ class Residente(models.Model):
 
 
 
-class Ingreso(models.Model):
-    residente = models.ForeignKey(Residente, on_delete=models.CASCADE)
-    fecha_admision = models.DateField()
-
-    def __str__(self):
-        return f"Admisión de {self.residente.nombre_apellido}"
-
-class Egreso(models.Model):
-    residente = models.ForeignKey(Residente, on_delete=models.CASCADE)
-    fecha_egreso = models.DateField()
-
-    def __str__(self):
-        return f"Egreso de {self.residente.nombre_apellido}"
-
-
-class Fichamedica(models.Model):
+class FichaMedica(models.Model):
+    # Residente asociado a la ficha médica
     residente = models.OneToOneField(Residente, on_delete=models.CASCADE)
-    presion_arterial = models.CharField(max_length=20)
-    alergias = models.TextField()
-    condiciones_medicas = models.TextField()
-    medicamentos = models.TextField()
+
+    # Historial médico
+    alergias = models.TextField(blank=True)
+    enfermedades_cronicas = models.TextField(blank=True)
+    cirugias_previas = models.TextField(blank=True)
+
+    # Historial de vacunación
+    vacunas = models.TextField(blank=True)
+
+    # Preferencias y restricciones dietéticas
+    restricciones_dieteticas = models.TextField(blank=True)
+    necesidades_especificas = models.TextField(blank=True)
+
+    # Información sobre servicios adicionales requeridos
+    cuidado_especializado = models.TextField(blank=True)
+    # Notas y observaciones
+    notas = models.TextField(blank=True)
 
     def __str__(self):
-        return self.residente.nombre_apellido
+        return f"Ficha Médica de {self.residente.nombre_apellido}"
+
+    def get_absolute_url(self):
+        return reverse("users:users-fichamedica-list")
+
+    def get_update_url(self):
+        return reverse("users:users-fichamedica-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-fichamedica-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-fichamedica-detail", kwargs={'pk': self.pk})
+
 
 
 class Medicamento(models.Model):
@@ -175,6 +187,8 @@ class Medicamento(models.Model):
 
     def get_detail_url(self):
         return reverse("users:users-medicamento-detail", kwargs={'pk': self.pk})
+
+
 
 class PlanMedicacion(models.Model):
     residente = models.OneToOneField('Residente', on_delete=models.CASCADE)

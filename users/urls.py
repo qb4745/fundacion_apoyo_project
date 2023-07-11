@@ -24,6 +24,13 @@ from .views import (DashBoardView,
                     DosisMedicamentoCreateView,
                     DosisMedicamentoUpdateView,
                     DosisMedicamentoDeleteView,
+                    DosisMedicamentoResidenteCreateView,
+                    FichaMedicaListView,
+                    FichaMedicaCreateView,
+                    FichaMedicaUpdateView,
+                    FichaMedicaDeleteView,
+                    FichaMedicaDetailView,
+
 
 
 
@@ -57,4 +64,10 @@ urlpatterns = [
     path('dosismedicamento/update/<int:pk>/', DosisMedicamentoUpdateView.as_view(), name='users-dosismedicamento-update'),
     path('dosismedicamento/delete/<int:pk>/', DosisMedicamentoDeleteView.as_view(), name='users-dosismedicamento-delete'),
     path('planmedicacion/details/<int:pk>/', PlanMedicacionDetailView.as_view(), name='users-planmedicacion-detail'),
+    path('planmedicacion/details/<int:pk>/dosismedicamentoresidente/create/', DosisMedicamentoResidenteCreateView.as_view(), name='users-dosismedicamentoresidente-create'),
+    path('fichamedica/', FichaMedicaListView.as_view(), name='users-fichamedica-list'),
+    path('fichamedica/create', FichaMedicaCreateView.as_view(), name='users-fichamedica-create'),
+    path('fichamedica/update/<int:pk>/', FichaMedicaUpdateView.as_view(), name='users-fichamedica-update'),
+    path('fichamedica/delete/<int:pk>/', FichaMedicaDeleteView.as_view(), name='users-fichamedica-delete'),
+    path('fichamedica/details/<int:pk>/', FichaMedicaDetailView.as_view(), name='users-fichamedica-detail'),
 ]

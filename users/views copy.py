@@ -3,11 +3,10 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render, reverse
 from django.views.generic import TemplateView, CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
-from .models import Mandato, Residente, Medicamento, PlanMedicacion, DosisMedicamento, FichaMedica
+from .models import Mandato, Residente, Medicamento, PlanMedicacion, DosisMedicamento
 from .forms import (MandatoForm, ResidenteForm, ResidenteDetailForm,
                     ResidentIngresoEgresoForm, MedicamentoForm, PlanMedicacionForm,
-                    DosisMedicamentoForm, PlanMedicacionDetailForm, FichaMedicaForm,
-                    FichaMedicaDetailForm
+                    DosisMedicamentoForm, PlanMedicacionDetailForm,
                     )
 from .mixins import StaffRequiredMixin
 
@@ -198,7 +197,7 @@ class PlanMedicacionCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateVie
 
 
 class PlanMedicacionUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
-    template_name = 'users/planmedicacion_update.html'
+    template_name = 'users/medicamento_update.html'
     form_class = PlanMedicacionForm
     queryset = PlanMedicacion.objects.all()
 
@@ -232,26 +231,34 @@ class DosisMedicamentoCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateV
     form_class = DosisMedicamentoForm
     success_url = reverse_lazy('users:users-dosismedicamento-list')
 
+
+class DosisMedicamentoResidenteCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
+    template_name = 'users/dosismedicamentos_create.html'
+    form_class = DosisMedicamentoForm
+    #success_url = reverse_lazy('users:users-planmedicacion-detail', kwargs={'pk': self.kwargs['pk']})
+
+
+    def form_valid(self, form):
+        plan_medicacion = get_object_or_404(PlanMedicacion, pk=self.kwargs['pk'])
+        form.instance.plan_medicacion = plan_medicacion
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('users:users-planmedicacion-detail', kwargs={'pk': self.kwargs['pk']})
+
+
+
 class DosisMedicamentoUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
     template_name = 'users/dosismedicamentos_update.html'
     form_class = DosisMedicamentoForm
     queryset = DosisMedicamento.objects.all()
-
-    def get_success_url(self):
-        dosis_medicamento = self.get_object()
-        plan_medicacion_pk = dosis_medicamento.plan_medicacion.pk
-        return reverse('users:users-planmedicacion-detail', kwargs={'pk': plan_medicacion_pk})
+    success_url = reverse_lazy('users:users-dosismedicamento-list')
 
 
 class DosisMedicamentoDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
     model = DosisMedicamento
     success_url = reverse_lazy('users:users-dosismedicamento-list')
     # Puedes especificar el template_name si deseas utilizar un template personalizado
-
-    def get_success_url(self):
-        dosis_medicamento = self.get_object()
-        plan_medicacion_pk = dosis_medicamento.plan_medicacion.pk
-        return reverse('users:users-planmedicacion-detail', kwargs={'pk': plan_medicacion_pk})
 
 
 class PlanMedicacionDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
@@ -265,85 +272,3 @@ class PlanMedicacionDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailVie
         dosis_medicamentos = plan_medicacion.dosismedicamento_set.all()  # Retrieve all DosisMedicamento objects
         context['dosis_medicamentos'] = dosis_medicamentos  # Add the dosis_medicamentos to the context
         return context
-
-
-class DosisMedicamentoResidenteCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
-    model = DosisMedicamento
-    fields = ['medicamento', 'dosis_diarias', 'hora_administracion']
-    template_name = 'users/dosismedicamentos_create.html'
-
-    def form_valid(self, form):
-        plan_medicacion = get_object_or_404(PlanMedicacion, pk=self.kwargs['pk'])
-        form.instance.plan_medicacion = plan_medicacion
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('users:users-planmedicacion-detail', kwargs={'pk': self.kwargs['pk']})
-
-
-# Vistas para el modelo FichaMedica
-
-
-class FichaMedicaListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
-    model = FichaMedica
-    template_name = 'users/fichamedica_list.html'
-    context_object_name = 'fichasmedicas'
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        queryset = queryset.order_by('-id')
-        return queryset
-
-
-class FichaMedicaCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
-    template_name = 'users/fichamedica_create.html'
-    form_class = FichaMedicaForm
-    success_url = reverse_lazy('users:users-fichamedica-list')
-
-class FichaMedicaUpdateView(LoginRequiredMixin, StaffRequiredMixin, UpdateView):
-    template_name = 'users/fichamedica_update.html'
-    form_class = FichaMedicaForm
-    queryset = FichaMedica.objects.all()
-    success_url = reverse_lazy('users:users-fichamedica-list')
-
-
-
-
-class FichaMedicaDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
-    model = FichaMedica
-    success_url = reverse_lazy('users:users-fichamedica-list')
-    # Puedes especificar el template_name si deseas utilizar un template personalizado
-
-
-class ResidenteDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
-    template_name = 'users/residente_detail.html'
-    model = Residente
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        residente = self.get_object()
-        form = ResidenteDetailForm(instance=residente)
-        # Disable editing in the form
-        for field in form.fields.values():
-            field.widget.attrs['disabled'] = True
-        context['form'] = form
-        return context
-
-
-class FichaMedicaDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
-    template_name = 'users/fichamedica_detail.html'
-    model = FichaMedica
-
-
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        fichamedica = self.get_object()
-        form = FichaMedicaDetailForm(instance=fichamedica)
-        # Disable editing in the form
-        for field in form.fields.values():
-            field.widget.attrs['disabled'] = True
-        context['form'] = form
-        return context
-
-

@@ -40,11 +40,10 @@
                 <div class="navbar-nav w-100">
                     <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link"><i class="fa-solid fa-person"></i>Residentes</a>
                     <a href="{% url 'users:users-residente-ingreso-egreso-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
-                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link"><i class="fa-solid fa-file-medical"></i>Fichas Médicas</a>
-                    <a href="{% url 'users:users-medicamento-list' %}" class="nav-item nav-link"><i class="fa-solid fa-capsules"></i>Medicamentos</a>
-                    <a href="{% url 'users:users-planmedicacion-list' %}" class="nav-item nav-link"><i class="fa-solid fa-map"></i>Plan de Medicación</a>
-                    <a href="{% url 'users:users-dosismedicamento-list' %}" class="nav-item nav-link active"><i class="fa-regular fa-clock"></i>Horario Medicación</a>
-
+                    <a href="{% url 'users:users-fichamedica-list' %}" class="nav-item nav-link"><i class="fa-solid fa-capsules"></i>Fichas Médicas</a>
+                    <a href="{% url 'users:users-medicamento-list' %}" class="nav-item nav-link "><i class="fa-solid fa-capsules"></i>Medicamentos</a>
+                    <a href="{% url 'users:users-planmedicacion-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-map"></i></i>Plan de Medicación</a>
+                    <a href="{% url 'users:users-dosismedicamento-list' %}" class="nav-item nav-link"><i class="fa-regular fa-clock"></i>Horario Medicación</a>
                 </div>
             </nav>
         </div>
@@ -147,7 +146,8 @@
 
             <div class="col-12">
                 <div class="bg-light rounded h-100 p-4">
-
+                    <h4 class="mb-4">Puedes Crear Horarios de Medicación con el boton "Crear Horario de Medicación".</h4>
+                    <a href="{% url 'users:users-dosismedicamentoresidente-create' plan_medicacion.pk %}" class="btn btn-outline-primary btn-rounded"><i class="fa-regular fa-square-plus fa-lg"><strong>Crear Horario de Medicación</strong></i></a>
 
 
                     <hr>
@@ -155,6 +155,7 @@
                         <h4 class="mb-4">Plan de Medicación Residente :  {{ plan_medicacion.residente.nombre_apellido }}</h4>
                         <h6 class="mb-4">R.U.T Residente :  {{ plan_medicacion.residente.rut }}</h6>
                         <h6 class="mb-4">Fecha de Creación :  {{ plan_medicacion.fecha_inicio }}</h6>
+                        <h6><a href="{{ plan_medicacion.get_absolute_url }}" class="btn btn-sm btn-info mt-auto">Volver</a></h6>
 
                             {% comment %} <h5 class="mb-4">Creado el: {{ mandato.created }}.</h5>
                             {% if mandato.created != mandato.updated %}
@@ -165,9 +166,11 @@
                                     <thead>
                                         <tr>
                                             <th scope="col">Residente</th>
-                                            <th scope="col">Nombre Medicamento</th>
-                                            <th scope="col">Dosis</th>
-                                            <th scope="col">Hora Administración</th>
+                                            <th scope="col">Medicamento</th>
+                                            <th scope="col">Dosis Diarias</th>
+                                            <th scope="col">Horario Administración</th>
+                                            <th scope="col">Editar</th>
+                                            <th scope="col">Eliminar</th>
 
                                         </tr>
                                     </thead>
@@ -178,13 +181,20 @@
                                                 <td>{{ dosis_medicamento.medicamento.compuesto }}</td>
                                                 <td>{{ dosis_medicamento.dosis_diarias }}</td>
                                                 <td>{{ dosis_medicamento.hora_administracion }}</td>
-                                            </tr>
+                                                <td><h6><a href="{{ dosis_medicamento.get_update_url }}" class="btn btn-sm btn-warning mt-auto">Editar</a></h6></td>
+                                                <td><h6>
+                                                <form method="post" action="{% url 'users:users-dosismedicamento-delete' dosis_medicamento.pk %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-danger mt-auto" onclick="return confirm('¿Estás seguro de eliminar el Horario de Medicación?')">Eliminar</button>
+                                                </form>
+                                                </h6></td>
                                         {% endfor %}
                                     </tbody>
                                 </table>
                             </div>
 
                         <hr>
+
                 </div>
             </div>
             <!-- Blank End -->
