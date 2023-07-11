@@ -1,7 +1,6 @@
 {% extends "users/base.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
-
 {% block head_title %}Fundación Apoyo - Administrador{% endblock head_title %}
 
 
@@ -39,12 +38,12 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-person"></i>Residentes</a>
-                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
-                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-file-medical"></i>Fichas Médicas</a>
-                    <a href="{% url 'users:users-medicamento-list' %}" class="nav-item nav-link "><i class="fa-solid fa-capsules"></i>Medicamentos</a>
-                    <a href="{% url 'users:users-planmedicacion-list' %}" class="nav-item nav-link"><i class="fa-solid fa-map"></i></i>Plan de Medicación</a>
-                    <a href="{% url 'users:users-dosismedicamento-list' %}" class="nav-item nav-link"><i class="fa-regular fa-clock"></i>Horario Medicación</a>
+                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link"><i class="fa-solid fa-person"></i>Residentes</a>
+                    <a href="{% url 'users:users-residente-ingreso-egreso-list' %}" class="nav-item nav-link "><i class="fa-solid fa-person-walking"></i></i>Ingresos/Egresos</a>
+                    <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link"><i class="fa-solid fa-file-medical"></i>Fichas Médicas</a>
+                    <a href="{% url 'users:users-medicamento-list' %}" class="nav-item nav-link"><i class="fa-solid fa-capsules"></i>Medicamentos</a>
+                    <a href="{% url 'users:users-planmedicacion-list' %}" class="nav-item nav-link"><i class="fa-solid fa-map"></i>Plan de Medicación</a>
+                    <a href="{% url 'users:users-dosismedicamento-list' %}" class="nav-item nav-link active"><i class="fa-regular fa-clock"></i>Horario Medicación</a>
 
                 </div>
             </nav>
@@ -144,23 +143,24 @@
     <!-- Navbar End -->
 
 
-            <!-- Blank Start -->
+             <!-- Blank Start -->
 
-            <div class="col-12">
+             <div class="col-12">
                 <div class="bg-light rounded h-100 p-4">
 
-                    <h4>Eliminar Residente</h4>
+                    <h4>Editar Horario de Medicación</h4>
                 <hr />
                 <form method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                     {{ form|crispy }}
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                    <button type="submit" class="btn btn-success">Editar</button>
 
                 </form>
                 </div>
                 <hr>
             </div>
             <!-- Blank End -->
+
 
 
 

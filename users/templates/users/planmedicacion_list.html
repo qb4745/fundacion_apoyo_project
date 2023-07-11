@@ -43,6 +43,7 @@
                     <a href="{% url 'users:users-residente-list' %}" class="nav-item nav-link "><i class="fa-solid fa-file-medical"></i>Fichas Médicas</a>
                     <a href="{% url 'users:users-medicamento-list' %}" class="nav-item nav-link "><i class="fa-solid fa-capsules"></i>Medicamentos</a>
                     <a href="{% url 'users:users-planmedicacion-list' %}" class="nav-item nav-link active"><i class="fa-solid fa-map"></i></i>Plan de Medicación</a>
+                    <a href="{% url 'users:users-dosismedicamento-list' %}" class="nav-item nav-link"><i class="fa-regular fa-clock"></i>Horario Medicación</a>
 
                 </div>
             </nav>
@@ -148,8 +149,8 @@
                 <div class="bg-light rounded h-100 p-4">
 
 
-                    <h4 class="mb-4">Puedes Crear un Plan Médico con el boton "Crear Plan Médico".</h4>
-                    <a href="{% url 'users:users-planmedicacion-create' %}" class="btn btn-outline-primary btn-rounded"><i class="fa-regular fa-square-plus fa-lg"><strong>Crear Plan Médico</strong></i></a>
+                    <h4 class="mb-4">Puedes Crear un Plan de Medicación con el boton "Crear Plan de Medicación".</h4>
+                    <a href="{% url 'users:users-planmedicacion-create' %}" class="btn btn-outline-primary btn-rounded"><i class="fa-regular fa-square-plus fa-lg"><strong>Crear Plan de Medicación</strong></i></a>
                     <hr>
 
 
@@ -166,7 +167,8 @@
                                             <th scope="col">ID #</th>
                                             <th scope="col">Residente</th>
                                             <th scope="col">Fecha_inicio</th>
-                                            <th scope="col">Medicamentos</th>
+                                            <th scope="col">Editar</th>
+                                            <th scope="col">Eliminar</th>
 
                                         </tr>
                                     </thead>
@@ -175,10 +177,8 @@
                                     {% for object in list %}
 
                                         <tr><h6>
-                                            {% comment %} <td><a href="{{ medicamento.get_detail_url }}">{{ medicamento.pk }}</a></td>
-                                            <td><a href="{{ medicamento.get_detail_url }}">{{ medicamento.nombre }}</a></td> {% endcomment %}
-                                            <td><h6>{{ object.pk }}</h6></td>
-                                            <td><h6>{{ object.residente }}</h6></td>
+                                            <td><a href="{{ object.get_detail_url }}">{{ object.pk }}</a></td>
+                                            <td><a href="{{ object.get_detail_url }}">{{ object.residente }}</a></td>
                                             <td><h6>{{ object.fecha_inicio }}</h6></td>
                                             <td><h6><a href="{{ object.get_update_url }}" class="btn btn-sm btn-warning mt-auto">Editar</a></h6></td>
 

@@ -208,7 +208,7 @@ class PlanMedicacion(models.Model):
 class DosisMedicamento(models.Model):
     plan_medicacion = models.ForeignKey(PlanMedicacion, on_delete=models.CASCADE)
     medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE)
-    dosis_diarias = models.CharField(max_length=100)
+    dosis = models.CharField(max_length=100)
     hora_administracion = models.TimeField()
 
     # Otros campos adicionales según tus necesidades
@@ -216,16 +216,3 @@ class DosisMedicamento(models.Model):
 
     def __str__(self):
         return f"{self.plan_medicacion} - Dosis de {self.medicamento}"
-
-    def get_absolute_url(self):
-        return reverse("users:users-dosismedicamento-list")
-
-    def get_update_url(self):
-        return reverse("users:users-dosismedicamento-update", kwargs={'pk': self.pk})
-
-    def get_delete_url(self):
-        return reverse("users:users-dosismedicamento-delete", kwargs={'pk': self.pk})
-
-    def get_detail_url(self):
-        return reverse("users:users-dosismedicamento-detail", kwargs={'pk': self.pk})
-

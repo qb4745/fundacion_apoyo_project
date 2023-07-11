@@ -162,3 +162,28 @@ class PlanMedicacionForm(forms.ModelForm):
         if fecha_inicio < timezone.now().date():
             raise forms.ValidationError("La fecha de inicio debe ser posterior o igual a la fecha actual.")
         return fecha_inicio
+
+
+class DosisMedicamentoForm(forms.ModelForm):
+    hora_administracion = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time'})
+    )
+
+    class Meta:
+        model = DosisMedicamento
+        fields = ["plan_medicacion", "medicamento", "dosis_diarias", "hora_administracion"]
+        labels = {
+            'plan_medicacion': 'Plan de Medicación',
+            'medicamento': 'Medicamento',
+            'dosis_diarias': 'Dosis_Diarias',
+            'hora_administracion': 'Horario de Administracion',
+        }
+
+
+class PlanMedicacionDetailForm(forms.ModelForm):
+
+    class Meta:
+        model = PlanMedicacion
+        fields = "__all__"
+
+

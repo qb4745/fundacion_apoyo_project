@@ -19,6 +19,12 @@ from .views import (DashBoardView,
                     PlanMedicacionCreateView,
                     PlanMedicacionUpdateView,
                     PlanMedicacionDeleteView,
+                    PlanMedicacionDetailView,
+                    DosisMedicamentoListView,
+                    DosisMedicamentoCreateView,
+                    DosisMedicamentoUpdateView,
+                    DosisMedicamentoDeleteView,
+
 
 
                     )
@@ -46,4 +52,9 @@ urlpatterns = [
     path('planmedicacion/create', PlanMedicacionCreateView.as_view(), name='users-planmedicacion-create'),
     path('planmedicacion/update/<int:pk>/', PlanMedicacionUpdateView.as_view(), name='users-planmedicacion-update'),
     path('planmedicacion/delete/<int:pk>/', PlanMedicacionDeleteView.as_view(), name='users-planmedicacion-delete'),
+    path('dosismedicamento/', DosisMedicamentoListView.as_view(), name='users-dosismedicamento-list'),
+    path('dosismedicamento/create', DosisMedicamentoCreateView.as_view(), name='users-dosismedicamento-create'),
+    path('dosismedicamento/update/<int:pk>/', DosisMedicamentoUpdateView.as_view(), name='users-dosismedicamento-update'),
+    path('dosismedicamento/delete/<int:pk>/', DosisMedicamentoDeleteView.as_view(), name='users-dosismedicamento-delete'),
+    path('planmedicacion/details/<int:pk>/', PlanMedicacionDetailView.as_view(), name='users-planmedicacion-detail'),
 ]
