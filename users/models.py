@@ -1,3 +1,245 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+from django.shortcuts import reverse
+from django.core.validators import MinValueValidator, MinLengthValidator
 
-# Create your models here.
+import datetime
+
+
+User = get_user_model()
+
+class Mandato(models.Model):
+    MODALIDAD_CHOICES = [
+        ('AbcVisa', 'AbcVisa'),
+        ('Falabella', 'Falabella'),
+        ('Hites', 'Hites'),
+        ('La Polar', 'La Polar'),
+        ('Paris', 'Paris'),
+        ('Ripley', 'Ripley'),
+    ]
+
+    user = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE)
+    numero_tarjeta = models.CharField(max_length=16, unique=True, validators=[MinLengthValidator(16)])
+    casa_comercial = models.CharField(max_length=50, choices=MODALIDAD_CHOICES)
+    monto = models.IntegerField(default=0, validators=[MinValueValidator(0)])  # must be positive
+    modalidad = models.CharField(max_length=50, default='Mensual')
+    start_date = models.DateField()
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(f"{self.numero_tarjeta} - {self.casa_comercial} - {self.monto} - {self.modalidad}")
+
+    def get_absolute_url(self):
+        return reverse("users:users-mandato", kwargs={'pk': self.pk})
+
+    def get_update_url(self):
+        return reverse("users:users-mandato-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-mandato-delete", kwargs={'pk': self.pk})
+
+    def get_last_digits(self):
+        last_four_digits = self.numero_tarjeta[-4:]
+        return "**** **** **** " + last_four_digits
+
+    def save(self, *args, **kwargs):
+        request = kwargs.pop('request', None)  # Retrieve the request object from kwargs
+        if not self.pk:  # Check if the instance is being created
+            if request and request.user.is_authenticated:
+                # Set the user field as the logged-in user
+                self.user = request.user
+        super().save(*args, **kwargs)
+
+
+
+
+
+GENERO_CHOICES = (
+        ('M', 'Masculino'),
+        ('F', 'Femenino'),
+    )
+
+ESTADO_CIVIL_CHOICES = (
+        ('S', 'Soltero/a'),
+        ('C', 'Casado/a'),
+        ('V', 'Viudo/a'),
+    )
+
+ESTADO_EN_HOGAR_CHOICES = (
+        ('I', 'Ingresado/a'),
+        ('E', 'Egresado/a'),
+    )
+
+
+class Residente(models.Model):
+    nombre_apellido = models.CharField(max_length=100)
+    rut = models.CharField(max_length=20)
+    nacionalidad = models.CharField(max_length=50, default='Chileno/a')
+    fecha_nacimiento = models.DateField()
+    estado_civil = models.CharField(max_length=20, choices=ESTADO_CIVIL_CHOICES)
+    genero = models.CharField(max_length=1, choices=GENERO_CHOICES)
+    direccion = models.CharField(max_length=200)
+    comuna = models.CharField(max_length=100)
+    celular = models.CharField(max_length=20)
+    estado_en_hogar = models.CharField(max_length=1, choices=ESTADO_EN_HOGAR_CHOICES, default='I')
+    fecha_admision = models.DateField(null=True, blank=True)
+    fecha_egreso = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.nombre_apellido
+
+    def get_absolute_url(self):
+        return reverse("users:users-residente-list")
+
+    def get_update_url(self):
+        return reverse("users:users-residente-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-residente-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-residente-detail", kwargs={'pk': self.pk})
+
+    def get_ingreso_egreso_update_url(self):
+        return reverse("users:users-residente-ingreso-egreso-update", kwargs={'pk': self.pk})
+
+    def get_age(self):
+        return int((datetime.date.today() - self.fecha_nacimiento).days / 365.25)
+
+    def save(self, *args, **kwargs):
+        if self.estado_en_hogar == 'E' and not self.fecha_egreso:
+            raise ValueError("La fecha de egreso es requerida para residentes egresados.")
+
+        if self.estado_en_hogar != 'E':
+            self.fecha_egreso = None
+
+        super().save(*args, **kwargs)
+
+    def egreso(self, fecha_egreso):
+        self.estado_en_hogar = 'Egresado'
+        self.fecha_egreso = fecha_egreso
+        self.save()
+
+
+
+
+
+
+class FichaMedica(models.Model):
+    # Residente asociado a la ficha médica
+    residente = models.OneToOneField(Residente, on_delete=models.CASCADE)
+
+    # Historial médico
+    alergias = models.TextField(blank=True)
+    enfermedades_cronicas = models.TextField(blank=True)
+    cirugias_previas = models.TextField(blank=True)
+
+    # Historial de vacunación
+    vacunas = models.TextField(blank=True)
+
+    # Preferencias y restricciones dietéticas
+    restricciones_dieteticas = models.TextField(blank=True)
+    necesidades_especificas = models.TextField(blank=True)
+
+    # Información sobre servicios adicionales requeridos
+    cuidado_especializado = models.TextField(blank=True)
+    # Notas y observaciones
+    notas = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Ficha Médica de {self.residente.nombre_apellido}"
+
+    def get_absolute_url(self):
+        return reverse("users:users-fichamedica-list")
+
+    def get_update_url(self):
+        return reverse("users:users-fichamedica-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-fichamedica-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-fichamedica-detail", kwargs={'pk': self.pk})
+
+
+
+class Medicamento(models.Model):
+    nombre = models.CharField(max_length=100)
+    compuesto = models.CharField(max_length=100)
+    dosis = models.CharField(max_length=100)
+
+    # Otros campos adicionales según tus necesidades
+    # ...
+
+    def __str__(self):
+        return f"Medicamento {self.nombre} - {self.compuesto} - {self.dosis}"
+
+    def get_absolute_url(self):
+        return reverse("users:users-medicamento-list")
+
+    def get_update_url(self):
+        return reverse("users:users-medicamento-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-medicamento-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-medicamento-detail", kwargs={'pk': self.pk})
+
+
+
+class PlanMedicacion(models.Model):
+    residente = models.OneToOneField('Residente', on_delete=models.CASCADE)
+    fecha_inicio = models.DateField()
+    medicamentos = models.ManyToManyField(Medicamento, through='DosisMedicamento')
+
+    # Otros campos adicionales según tus necesidades
+    # ...
+
+    def __str__(self):
+        return f"{self.pk} Plan de Medicación para {self.residente}"
+
+    def get_absolute_url(self):
+        return reverse("users:users-planmedicacion-list")
+
+    def get_update_url(self):
+        return reverse("users:users-planmedicacion-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-planmedicacion-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-planmedicacion-detail", kwargs={'pk': self.pk})
+
+    @classmethod
+    def create(cls, residente, fecha_inicio):
+        if cls.objects.filter(residente=residente).exists():
+            raise Exception("A PlanMedicacion already exists for this Residente.")
+        return cls.objects.create(residente=residente, fecha_inicio=fecha_inicio)
+
+class DosisMedicamento(models.Model):
+    plan_medicacion = models.ForeignKey(PlanMedicacion, on_delete=models.CASCADE)
+    medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE)
+    dosis_diarias = models.CharField(max_length=100)
+    hora_administracion = models.TimeField()
+
+    # Otros campos adicionales según tus necesidades
+    # ...
+
+    def __str__(self):
+        return f"{self.plan_medicacion} - Dosis de {self.medicamento}"
+
+    def get_absolute_url(self):
+        return reverse("users:users-dosismedicamento-list")
+
+    def get_update_url(self):
+        return reverse("users:users-dosismedicamento-update", kwargs={'pk': self.pk})
+
+    def get_delete_url(self):
+        return reverse("users:users-dosismedicamento-delete", kwargs={'pk': self.pk})
+
+    def get_detail_url(self):
+        return reverse("users:users-dosismedicamento-detail", kwargs={'pk': self.pk})
+
